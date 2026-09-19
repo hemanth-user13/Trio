@@ -8,3 +8,6 @@ from .models import *
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
     pass
+
+admin.site.register(DemoData)
+
