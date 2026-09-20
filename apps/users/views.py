@@ -42,9 +42,9 @@ def getUserList(request):
 
 @api_view(["GET","POST","DELETE"])
 @permission_classes([AllowAny])
-def UserActions(request,user_id=None):
+def UserActions(request,pk=None):
     if request.method=="GET":
-        if user_id is  None:
+        if pk is  None:
             try:
                 users=User.objects.all()
                 serializerdata=UserModalSerializer(users,many=True)
@@ -59,9 +59,9 @@ def UserActions(request,user_id=None):
                 })
 
     if request.method=="GET":
-        if user_id is not None:
+        if pk is not None:
             try:
-                user=User.objects.get(id=user_id)
+                user=User.objects.get(id=pk)
             except User.DoesNotExist:
                 return Response({
                     "message":"User doesn't exists",
@@ -96,13 +96,13 @@ def UserActions(request,user_id=None):
 
 
     if request.method=="DELETE":
-            if user_id is None:
+            if pk is None:
                 return Response({
                     "message":"User id is required",
                     "status":False
                 },status=status.HTTP_404_NOT_FOUND)
             try:
-                userdata=User.objects.get(id=user_id)
+                userdata=User.objects.get(id=pk)
             except User.DoesNotExist:
                 return Response({
                     "message":"User not found",
@@ -140,3 +140,14 @@ class UserClassActions(APIView):
             "data":userlist.data,
             "status":True
         })
+
+
+from rest_framework import generics
+
+class UserGenericView(generics.ListCreateAPIView):
+    permission_classes=[AllowAny]
+    serializer_class=UserModalSerializer
+
+    def get_queryset(self):
+        return User.objects.filter(is_active=True)
+

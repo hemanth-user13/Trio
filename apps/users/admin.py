@@ -11,3 +11,7 @@ class CustomUserAdmin(UserAdmin):
 
 admin.site.register(DemoData)
 
+admin.site.register(Organization)
+
+admin.site.register(OrganizationMembership)
+
