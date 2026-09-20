@@ -18,3 +18,19 @@ class UserModalSerializer(serializers.ModelSerializer):
         exclude =[
             "password"
         ]
+
+    def validate_username(self,value):
+        if " " in value:
+            raise serializers.ValidationError(
+                "username connot contain space"
+            )
+        return value
+
+
+    def validate(self,attrs):
+        if attrs["username"]==attrs["email"]:
+            raise serializers.ValidationError(
+                "username and email should not be equal"
+            )
+        return attrs
+
