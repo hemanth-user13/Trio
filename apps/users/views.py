@@ -151,3 +151,101 @@ class UserGenericView(generics.ListCreateAPIView):
     def get_queryset(self):
         return User.objects.filter(is_active=True)
 
+
+
+### organizations apis
+class OrganizationListCreateView(generics.ListCreateAPIView):
+
+    permission_classes=[AllowAny]
+
+    queryset=Organization.objects.all()
+    serializer_class=OrganizationSerializer
+
+
+### organization detail api
+class OrganizationDetailView(generics.RetrieveUpdateDestroyAPIView):
+
+    permission_classes=[AllowAny]
+
+    queryset=Organization.objects.all()
+    serializer_class=OrganizationSerializer
+
+
+
+
+### redis concept
+from .redis_client import redis_client
+
+class RedisTestApi(APIView):
+
+    permission_classes=[AllowAny]
+
+    def get(self,request):
+        redis_client.set(
+            "knowledgehub:test",
+            "hello these is hemanth",
+            ex=60
+        )
+
+        value=redis_client.get("knowledgehub:test")
+        return Response({
+            "status":"success",
+            "data":value
+        })
+
+
+
+import json
+
+class RedisOrganization(APIView):
+
+    permission_classes=[AllowAny]
+
+    def get(self,request):
+        #### check the redis first
+        cached_data=redis_client.get("organization:list")
+
+        if cached_data:
+            data=json.loads(cached_data)
+            return Response({
+                "status":True,
+                "data":data
+            },status=status.HTTP_200_OK)
+
+        organization=Organization.objects.all()
+        print("hemanth")
+        serializer=OrganizationSerializer(
+            organization,
+            many=True
+        )
+
+        redis_client.set(
+            "organization:list",
+            json.dumps(serializer.data),
+            ex=60
+        )
+
+        return Response({
+            "status":True,
+            "data":serializer.data
+        },status=status.HTTP_200_OK)
+
+    def post(self,request):
+        serializer=OrganizationSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            redis_client.delete("organization:list")
+
+            return Response({
+                    "message":"organization created successfully!",
+                    "data":serializer.data,
+                    "status":True
+                },status=status.HTTP_201_CREATED)
+        return Response({
+                    "message":"There is an issue in creating the organization",
+                    "error":serializer.errors,
+                    "status":False
+                },status=status.HTTP_400_BAD_REQUEST)
+            
+
+       

@@ -34,3 +34,27 @@ class UserModalSerializer(serializers.ModelSerializer):
             )
         return attrs
 
+
+class OrganizationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Organization
+        fields=[
+            "id",
+            "name",
+            "slug",
+            "is_active",
+            "created_at",
+            "updated_at"
+        ]
+        read_only_fields=[
+            "id",
+            "created_at",
+            "updated_at"
+        ]
+
+    def validate_name(self,value):
+        if not value.strip():
+            raise serializers.ValidationError(
+                "Organization name cannot be empty"
+            )
+        return value

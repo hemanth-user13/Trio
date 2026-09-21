@@ -7,5 +7,14 @@ urlpatterns = [
     path("userList/",views.UserActions,name="user_list"),
     path("userList/<int:pk>/",views.UserActions,name="show_user"),
     path("list/",UserClassActions.as_view(),name="class_user"),
-    path("genericList/",UserGenericView.as_view(),name="generic_class")
+    path("genericList/",UserGenericView.as_view(),name="generic_class"),
+
+
+    path("organization/",OrganizationListCreateView.as_view(),name="organization_list"),
+    path("organization/<int:pk>/",OrganizationDetailView.as_view(),name="organization_detail"),
+
+    path('redisdemo/',RedisTestApi.as_view(),name="redis-test-api"),
+
+
+    path("redis-orgianization/",RedisOrganization.as_view(),name="redis-organization")
 ]
