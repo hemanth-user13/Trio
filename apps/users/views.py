@@ -196,6 +196,8 @@ class RedisTestApi(APIView):
 
 
 import json
+from .redis_key import orgnaization_detail_key
+
 
 class RedisOrganization(APIView):
 
@@ -230,6 +232,49 @@ class RedisOrganization(APIView):
             "data":serializer.data
         },status=status.HTTP_200_OK)
 
+
+    def get(self,request,organization_id):
+        cache_key=orgnaization_detail_key(organization_id)
+
+        cache_data=redis_client.get(
+            cache_key
+        )
+
+        if cache_data:
+            data=json.loads(cache_data)
+
+            return Response({
+                "status":True,
+                "data":data
+            })
+
+        try:
+            organization=Organization.objects.get(id=organization_id)
+
+        except Organization.DoesNotExist:
+            return Response({
+                "status":False,
+                "message":"Organization not found"
+
+            },status=status.HTTP_404_NOT_FOUND)
+
+
+        serializer=OrganizationSerializer(organization)
+
+        data=serializer.data
+
+        redis_client.set(
+            cache_key,
+            json.dumps(data),
+            ex=300
+        )
+
+        return Response({
+            "status":True,
+            "data":data
+        })
+
+        
     def post(self,request):
         serializer=OrganizationSerializer(data=request.data)
         if serializer.is_valid():
