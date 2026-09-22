@@ -196,7 +196,7 @@ class RedisTestApi(APIView):
 
 
 import json
-from .redis_key import orgnaization_detail_key
+from .redis_key import orgnaization_detail_key,ORGANIZATION_LIST_KEY
 
 
 class RedisOrganization(APIView):
@@ -232,6 +232,67 @@ class RedisOrganization(APIView):
             "data":serializer.data
         },status=status.HTTP_200_OK)
 
+    def post(self,request):
+        serializer=OrganizationSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            redis_client.delete("organization:list")
+
+            return Response({
+                    "message":"organization created successfully!",
+                    "data":serializer.data,
+                    "status":True
+                },status=status.HTTP_201_CREATED)
+        return Response({
+                    "message":"There is an issue in creating the organization",
+                    "error":serializer.errors,
+                    "status":False
+                },status=status.HTTP_400_BAD_REQUEST)
+
+    def patch(self,request,organization_id):
+        try:
+            organization=Organization.objects.get(id=organization_id)
+
+        except Organization.DoesNotExist:
+            return Response({
+                "status":False,
+                "message":"Organization not found"
+            },status=status.HTTP_404_NOT_FOUND)
+
+        serializer=OrganizationSerializer(
+            organization,
+            data=request.data,
+            partial=True
+        )       
+
+        if not serializer.is_valid():
+            return Response({
+                "status":False,
+                "errors":serializer.errors
+            },status=status.HTTP_404_NOT_FOUND)
+
+        serializer.save()
+
+        redis_client.delete(
+            orgnaization_detail_key(organization_id)
+        )
+
+        redis_client.delete(
+            ORGANIZATION_LIST_KEY
+        )
+
+        return Response({
+            "status":True,
+            "message":"Organization updated successfully!",
+            "data":serializer.data
+        })
+
+        
+
+       
+class RedisOrganizationDetail(APIView):
+
+    permission_classes=[AllowAny]
 
     def get(self,request,organization_id):
         cache_key=orgnaization_detail_key(organization_id)
@@ -258,7 +319,6 @@ class RedisOrganization(APIView):
 
             },status=status.HTTP_404_NOT_FOUND)
 
-
         serializer=OrganizationSerializer(organization)
 
         data=serializer.data
@@ -273,24 +333,3 @@ class RedisOrganization(APIView):
             "status":True,
             "data":data
         })
-
-        
-    def post(self,request):
-        serializer=OrganizationSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            redis_client.delete("organization:list")
-
-            return Response({
-                    "message":"organization created successfully!",
-                    "data":serializer.data,
-                    "status":True
-                },status=status.HTTP_201_CREATED)
-        return Response({
-                    "message":"There is an issue in creating the organization",
-                    "error":serializer.errors,
-                    "status":False
-                },status=status.HTTP_400_BAD_REQUEST)
-            
-
-       
