@@ -286,9 +286,7 @@ class RedisOrganization(APIView):
             "message":"Organization updated successfully!",
             "data":serializer.data
         })
-
         
-
        
 class RedisOrganizationDetail(APIView):
 
@@ -333,3 +331,23 @@ class RedisOrganizationDetail(APIView):
             "status":True,
             "data":data
         })
+
+
+class OrganizationListApi(APIView):
+
+    permission_classes=[AllowAny]
+
+    def get(self,request):
+        data=Organization.objects.raw(
+            "SELECT * FROM users_organization"
+        )
+        serializer=OrganizationSerializer(data,many=True)
+
+        return Response({
+            "status":True,
+            "data":serializer.data,
+            "message":"hello "
+        })
+
+
+    
