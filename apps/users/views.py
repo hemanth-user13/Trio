@@ -349,5 +349,38 @@ class OrganizationListApi(APIView):
             "message":"hello "
         })
 
+### Transactions
 
-    
+# from django.db import transaction
+
+# with transaction.atomic():
+#     organization=Organization.objects.create(
+#         name="DemoTest",
+#         slug="test2132"
+#     )
+
+#     membershp=OrganizationMembership.objects.create(
+#         user=User,
+#         oraganization=organization,
+#         role="admin"
+
+#     )
+
+# with transaction.atomic():
+
+#     organization = Organization.objects.create(
+#         name="KnowledgeHub",
+#         slug="knowledgehub"
+#     )
+
+#     membership = OrganizationMembership.objects.create(
+#         user=user,
+#         organization=organization,
+#         role="admin"
+#     )
+
+#     AuditLog.objects.create(
+#         user=user,
+#         action="organization_created",
+#         organization=organization
+#     )
