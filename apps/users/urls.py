@@ -20,5 +20,8 @@ urlpatterns = [
 
     path("redis-organization/<int:organization_id>/",RedisOrganizationDetail.as_view(),name="organization_show_api"),
 
-    path("org-raw/",OrganizationListApi.as_view(),name="raw-query")
+    path("org-raw/",OrganizationListApi.as_view(),name="raw-query"),
+
+
+    path("documents/list",DocumentListApi.as_view(),name="document_list")
 ]

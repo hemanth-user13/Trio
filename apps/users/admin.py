@@ -15,3 +15,8 @@ admin.site.register(Organization)
 
 admin.site.register(OrganizationMembership)
 
+admin.site.register(Tag)
+
+
+admin.site.register(Document)
+

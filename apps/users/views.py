@@ -384,3 +384,21 @@ class OrganizationListApi(APIView):
 #         action="organization_created",
 #         organization=organization
 #     )
+
+
+class DocumentListApi(APIView):
+    
+    permission_classes=[AllowAny]
+
+    def get(self,request):
+        documents=Document.objects.prefetch_related("tags")
+
+        serializer=DocumentSerializer(documents,many=True)
+
+        return Response({
+            "status":True,
+            "data":serializer.data
+        },status=status.HTTP_400_BAD_REQUEST)
+
+
+    

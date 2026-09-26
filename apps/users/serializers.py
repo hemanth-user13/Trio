@@ -58,3 +58,23 @@ class OrganizationSerializer(serializers.ModelSerializer):
                 "Organization name cannot be empty"
             )
         return value
+
+
+
+class TagSerializer(serializers.ModelSerializer):
+
+
+    class Meta:
+        model=Tag
+        fields=["id","name"]
+
+
+
+class DocumentSerializer(serializers.ModelSerializer):
+
+    tags=TagSerializer(many=True,read_only=True)
+    
+    class Meta:
+        model=Document
+        fields=["id","title","tags"]
+

@@ -18,8 +18,8 @@ class DemoData(models.Model):
 
 class Organization(models.Model):
     name=models.CharField(max_length=40)
-    slug=models.SlugField(unique=True)
-    is_active=models.BooleanField(default=True)
+    slug=models.SlugField(unique=True,max_length=100)
+    is_active=models.BooleanField(default=True,db_index=True)
     created_at=models.DateField(auto_now_add=True)
     updated_at=models.DateField(auto_now=True)
     
@@ -54,4 +54,21 @@ class OrganizationMembership(models.Model):
 
     def __str__(self):
         return f"{self.user} - {self.organization} - {self.role}"
+
+
+
+class Tag(models.Model):
+    name=models.CharField(max_length=40)
+
+    def __str__(self):
+        return f"{self.name}"
+
+
+class Document(models.Model):
+    title=models.CharField(max_length=400)
+    tags=models.ManyToManyField(Tag)
+
+    def __str__(self):
+       return f"{self.title} - {', '.join(t.name for t in self.tags.all())}"
+
 
