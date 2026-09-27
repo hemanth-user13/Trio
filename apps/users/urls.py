@@ -23,5 +23,8 @@ urlpatterns = [
     path("org-raw/",OrganizationListApi.as_view(),name="raw-query"),
 
 
-    path("documents/list",DocumentListApi.as_view(),name="document_list")
+    path("documents/list",DocumentListApi.as_view(),name="document_list"),
+
+
+    path('document/count',OrganizationDocumentListApi.as_view(),name="document-count")
 ]

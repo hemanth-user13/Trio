@@ -36,6 +36,11 @@ class UserModalSerializer(serializers.ModelSerializer):
 
 
 class OrganizationSerializer(serializers.ModelSerializer):
+
+
+    document_count=serializers.IntegerField(
+        read_only=True
+    )
     class Meta:
         model=Organization
         fields=[
@@ -44,7 +49,8 @@ class OrganizationSerializer(serializers.ModelSerializer):
             "slug",
             "is_active",
             "created_at",
-            "updated_at"
+            "updated_at",
+            "document_count"
         ]
         read_only_fields=[
             "id",
@@ -73,7 +79,7 @@ class TagSerializer(serializers.ModelSerializer):
 class DocumentSerializer(serializers.ModelSerializer):
 
     tags=TagSerializer(many=True,read_only=True)
-    
+
     class Meta:
         model=Document
         fields=["id","title","tags"]

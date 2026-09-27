@@ -401,4 +401,27 @@ class DocumentListApi(APIView):
         },status=status.HTTP_400_BAD_REQUEST)
 
 
+from django.db.models import Count
+
+
+class OrganizationDocumentListApi(APIView):
+    permission_classes=[AllowAny]
+
+    def get(self,request):
+        organizations=Organization.objects.annotate(
+            document_count=Count("documents")
+        )
+
+        serializer=OrganizationSerializer(
+            organizations,
+            many=True
+        )
+
+
+        return Response(
+            {
+                "status":True,
+                "data":serializer.data
+            }
+        )
     

@@ -68,6 +68,12 @@ class Document(models.Model):
     title=models.CharField(max_length=400)
     tags=models.ManyToManyField(Tag)
 
+    organization=models.ForeignKey(
+        Organization,
+        on_delete=models.CASCADE,
+        related_name="documents"
+    )
+
     def __str__(self):
        return f"{self.title} - {', '.join(t.name for t in self.tags.all())}"
 
