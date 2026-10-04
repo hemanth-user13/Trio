@@ -216,13 +216,12 @@ class LogoutAllView(APIView):
                             f"Logged out from {tokens.count()} session(s).")
 
 
-class MeView(APIView):
+class MeView(PublicAPIView):
     """
     GET    /api/auth/me/   -> profile
     PATCH  /api/auth/me/   -> update profile
     DELETE /api/auth/me/   -> deactivate account (soft delete)
     """
-    permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
         return api_response("ok", "PROFILE", "Profile fetched.", UserSerializer(request.user).data)
