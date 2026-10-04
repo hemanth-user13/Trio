@@ -14,6 +14,7 @@ from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
+from datetime import timedelta
 
 
 # Quick-start development settings - unsuitable for production
@@ -38,9 +39,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'apps.users',
-    'apps.documents',
-    'apps.authentication'
+    # 'apps.users',
+    # 'apps.documents',
+    'apps.authentication',
+    "rest_framework_simplejwt",
+    "rest_framework_simplejwt.token_blacklist",  # needed for logout / 
 ]
 
 MIDDLEWARE = [
@@ -80,11 +83,43 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 
 REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
+    "DEFAULT_THROTTLE_RATES": {
+        "otp_send": "5/minute",
+        "otp_verify": "10/minute",
+    },
 }
 
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "ROTATE_REFRESH_TOKENS": True,        # /token/refresh/ returns a new refresh too
+    "BLACKLIST_AFTER_ROTATION": True,     # old refresh becomes unusable
+    "UPDATE_LAST_LOGIN": False,           # we do it ourselves in the views
+    "AUTH_HEADER_TYPES": ("Bearer",),
+    "USER_ID_FIELD": "id",
+    "USER_ID_CLAIM": "user_id",
+}
+
+OTP_USE_DUMMY = True          # False -> random OTP
+OTP_DUMMY_CODE = "123456"
+OTP_LENGTH = 6
+OTP_EXPIRY_SECONDS = 300
+OTP_RESEND_COOLDOWN_SECONDS = 30
+DEFAULT_COUNTRY_CODE = "+91"
+
+# See the dummy "SMS" in your console
+LOGGING = {
+    "version": 1,
+    "handlers": {"console": {"class": "logging.StreamHandler"}},
+    "loggers": {"accounts": {"handlers": ["console"], "level": "INFO"}},
+
+}
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
@@ -131,7 +166,7 @@ USE_I18N = True
 
 USE_TZ = True
 
-AUTH_USER_MODEL ="users.User"
+AUTH_USER_MODEL ="authentication.User"
 
 
 # Static files (CSS, JavaScript, Images)
